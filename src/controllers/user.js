@@ -2,9 +2,14 @@ import asyncHandler from '../middleware/async'
 import { makeResponse } from '../utils/response'
 import { addInterests, updateUser, getUser, deleteOne } from '../services/user'
 
+function sanitizeInput(input) {
+  // Remove leading/trailing white spaces and escape HTML characters
+  return input.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 export const pickInterests = asyncHandler(async (req, res) => {
   //req.user wont work
-  const result = await addInterests(req.user.email, req.body.interests)
+  const result = await addInterests(req.user.email, sanitizeInput(req.body.interests))
   if (!result)
     return makeResponse({
       res,
@@ -16,7 +21,7 @@ export const pickInterests = asyncHandler(async (req, res) => {
 })
 
 export const editUser = asyncHandler(async (req, res) => {
-  const result = await updateUser(req.body.email, req.body)
+  const result = await updateUser(req.body.email, sanitizeInput(req.body))
   if (!result)
     return makeResponse({
       res,

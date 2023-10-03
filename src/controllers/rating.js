@@ -9,10 +9,15 @@ import {
   getReviewService,
 } from '../services/rating'
 
+function sanitizeInput(input) {
+  // Remove leading/trailing white spaces and escape HTML characters
+  return input.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // Function to handle adding a review
 export const postReview = asyncHandler(async (req, res) => {
   // Call the addReview service with request body
-  const result = await addReview(req.body)
+  const result = await addReview(sanitizeInput(req.body))
   // If result is false, return an error response
   if (!result)
     return makeResponse({
@@ -45,7 +50,7 @@ export const removeReview = asyncHandler(async (req, res) => {
 // Function to handle updating a review
 export const updateReview = asyncHandler(async (req, res) => {
   // Call the updateReview  service with request params
-  const result = await updateReviewService(req.body)
+  const result = await updateReviewService(sanitizeInput(req.body))
   // If result is false, return an error response
   if (!result)
     return makeResponse({

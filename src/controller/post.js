@@ -33,15 +33,20 @@ let Post = require('../models/post')
 
 const postService = require('../services/post')
 
+function sanitizeInput(input) {
+  // Remove leading/trailing white spaces and escape HTML characters
+  return input.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 export function addNewPost(req, res) {
   const postData = {
-    userId: req.body.userId,
-    groupId: req.body.groupId,
-    contentText: req.body.contentText,
-    images: req.body.images,
-    comments: req.body.comments,
-    userName: req.body.userName,
-    photoUrl: req.body.photoUrl,
+    userId: sanitizeInput(req.body.userId),
+    groupId: sanitizeInput(req.body.groupId),
+    contentText: sanitizeInput(req.body.contentText),
+    images: req.body.images, // No need to sanitize images
+    comments: req.body.comments, // No need to sanitize comments
+    userName: sanitizeInput(req.body.userName),
+    photoUrl: sanitizeInput(req.body.photoUrl),
   }
 
   postService

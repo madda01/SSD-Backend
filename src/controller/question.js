@@ -3,10 +3,15 @@ import mongoose from 'mongoose';
 // const { addQuestionAnswer } = require('../services/question');
 import { addQuestionAnswers, updateAnswers, deleteQuestionAnswers, getUserQuestion, getAllTheQuestion, deleteQuestions, getEveryQuestion, searchQuestions } from '../services/question'
 
+function sanitizeInput(input) {
+  // Remove leading/trailing white spaces and escape HTML characters
+  return input.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 // Add a question or answer a question
 export async function addQuestionAnswer(req, res) {
   let data = req.body;
+  data.Answers = sanitizeInput(data.Answers);
   console.log(data.Answers)
   try{
       await addQuestionAnswers(data);
@@ -71,8 +76,9 @@ export const deleteQuestion = async (req, res) => {
 // get group questions
 export async function getAllQuestions(req, res) {
   try {
-      const questions = await getAllTheQuestion(req.query.search);
-      res.status(200).json(questions);
+    const search = sanitizeInput(req.query.search);
+    const questions = await getAllTheQuestion(search);
+    res.status(200).json(questions);
   } catch (e) {
       console.log(e);
       res.status(500).send("Internal server error");
@@ -82,7 +88,8 @@ export async function getAllQuestions(req, res) {
 //get questions of a single USER
 export async function getSingleUserQuestions(req, res) {
   try {
-      const questions = await getUserQuestion(req.query.userID);
+    const userID = sanitizeInput(req.query.userID);
+    const questions = await getUserQuestion(userID);
       res.status(200).json(questions);
   } catch (e) {
       console.log(e);
@@ -119,7 +126,9 @@ export async function getEveryQuestions(req, res){
 
 export async function searchQuestion(req, res){
   try {
-      const questions = await searchQuestions(req.query.question, req.query.group);
+    const question = sanitizeInput(req.query.question);
+    const group = sanitizeInput(req.query.group);
+    const questions = await searchQuestions(question, group);
       if (questions.length === 0) {
           return res.status(404).json({ message: 'Try different keywords' });
       }

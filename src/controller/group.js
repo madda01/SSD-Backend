@@ -1,13 +1,19 @@
 let Group = require('../models/group')
 const group = require('../services/group')
 
+function sanitizeInput(input) {
+  // Remove leading/trailing white spaces and escape HTML characters
+  return input.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function addNewGroup(req, res) {
-  const groupName = req.body.groupName
-  const description = req.body.description
-  const category = req.body.category
-  const groupIcon = req.body.groupIcon
-  const adminId = req.body.adminId
-  const followersUserId = req.body.followersUserId
+  // Sanitize user inputs
+   const groupName = sanitizeInput(req.body.groupName);
+   const description = sanitizeInput(req.body.description);
+   const category = sanitizeInput(req.body.category);
+   const groupIcon = sanitizeInput(req.body.groupIcon);
+   const adminId = sanitizeInput(req.body.adminId);
+   const followersUserId = req.body.followersUserId; // Assuming it's an array
 
   group
     .addNewGroup(groupName, description, category, groupIcon, adminId, followersUserId)
@@ -16,6 +22,7 @@ function addNewGroup(req, res) {
     })
     .catch((err) => {
       console.log(err)
+      res.status(500).send('Failed to create a group')
     })
 }
 
@@ -27,6 +34,7 @@ function getAllGroups(req, res) {
     })
     .catch((err) => {
       console.log(err)
+      res.status(500).send('Failed to get groups');
     })
 }
 
